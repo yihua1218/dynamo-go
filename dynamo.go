@@ -33,6 +33,8 @@ var (
 )
 
 func init() {
+	fmt.Println(db)
+
 	db.Config, db.Error = external.LoadDefaultAWSConfig()
 
 	if db.Error != nil {
@@ -66,4 +68,16 @@ func New(region string) DB {
 	}
 
 	return db
+}
+
+func listTables() {
+	input := &dynamodb.ListTablesInput{}
+	req := db.Client.ListTablesRequest(input)
+	res, err := req.Send()
+
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println(res)
+	}
 }
