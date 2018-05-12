@@ -43,7 +43,7 @@ func init() {
 }
 
 // New carete new DynamoDB access instance
-func New(region string) {
+func New(region string) DB {
 	db.Region = region
 
 	db.Client = dynamodb.New(db.Config)
@@ -66,4 +66,6 @@ func New(region string) {
 	} else {
 		fmt.Println(res)
 	}
+
+	return db
 }
