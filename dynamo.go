@@ -16,31 +16,37 @@ type TableDef struct {
 	Indexes   []string
 }
 
-// Conf is the configuration of this DynamoDB access instance
-type Conf struct {
+// DB is the configuration of this DynamoDB access instance
+type DB struct {
 	Tables []TableDef
 	Region string
+	Config aws.Config
+	Client *dynamodb.DynamoDB
+	Error  error
 }
 
 var (
-	conf = Conf{
+	db = DB{
 		Tables: []TableDef{},
 		Region: "us-west-2",
 	}
 )
 
 func init() {
-	fmt.Println(conf)
+	fmt.Println(db)
 
-	cfg, err := external.LoadDefaultAWSConfig()
+	db.Config, db.Error = external.LoadDefaultAWSConfig()
 
-	if err != nil {
-		panic("unable to load SDK config, " + err.Error())
+	if db.Error != nil {
+		panic("unable to load SDK config, " + db.Error.Error())
 	}
+}
 
-	cfg.Region = conf.Region
+// New carete new DynamoDB access instance
+func New(region string) {
+	db.Region = region
 
-	svc := dynamodb.New(cfg)
+	db.Client = dynamodb.New(db.Config)
 
 	input := &dynamodb.QueryInput{
 		ExpressionAttributeValues: map[string]dynamodb.AttributeValue{
@@ -52,8 +58,12 @@ func init() {
 		TableName:              aws.String("g3_devices"),
 	}
 
-	req := svc.QueryRequest(input)
+	req := db.Client.QueryRequest(input)
 
 	res, err := req.Send()
-	fmt.Println(res)
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println(res)
+	}
 }
