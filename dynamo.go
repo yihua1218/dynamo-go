@@ -33,8 +33,6 @@ var (
 )
 
 func init() {
-	fmt.Println(db)
-
 	db.Config, db.Error = external.LoadDefaultAWSConfig()
 
 	if db.Error != nil {
