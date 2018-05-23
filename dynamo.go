@@ -25,25 +25,19 @@ type DB struct {
 	Error  error
 }
 
-var (
-	db = DB{
+// New carete new DynamoDB access instance
+func New(region string) DB {
+	db := DB{
 		Tables: []TableDef{},
 		Region: "us-west-2",
 	}
-)
-
-func init() {
-	fmt.Println(db)
 
 	db.Config, db.Error = external.LoadDefaultAWSConfig()
 
 	if db.Error != nil {
 		panic("unable to load SDK config, " + db.Error.Error())
 	}
-}
 
-// New carete new DynamoDB access instance
-func New(region string) DB {
 	db.Region = region
 
 	db.Client = dynamodb.New(db.Config)
@@ -70,7 +64,7 @@ func New(region string) DB {
 	return db
 }
 
-func listTables() {
+func (db DB) listTables() {
 	input := &dynamodb.ListTablesInput{}
 	req := db.Client.ListTablesRequest(input)
 	res, err := req.Send()
