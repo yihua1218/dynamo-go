@@ -25,6 +25,10 @@ type DB struct {
 	Error  error
 }
 
+func init() {
+	createDirIfNotExist("cache")
+}
+
 // New carete new DynamoDB access instance
 func New(region string) DB {
 	db := DB{
@@ -43,19 +47,6 @@ func New(region string) DB {
 	db.Client = dynamodb.New(db.Config)
 
 	return db
-}
-
-// ListTables list DynamoDB tables
-func (db DB) ListTables() {
-	input := &dynamodb.ListTablesInput{}
-	req := db.Client.ListTablesRequest(input)
-	res, err := req.Send()
-
-	if err != nil {
-		fmt.Println(err)
-	} else {
-		fmt.Println(res)
-	}
 }
 
 // Query table, primary_key
