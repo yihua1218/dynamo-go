@@ -42,33 +42,37 @@ func New(region string) DB {
 
 	db.Client = dynamodb.New(db.Config)
 
-	input := &dynamodb.QueryInput{
-		ExpressionAttributeValues: map[string]dynamodb.AttributeValue{
-			":id": {
-				S: aws.String("03AFB154"),
-			},
-		},
-		KeyConditionExpression: aws.String("id = :id"),
-		TableName:              aws.String("g3_devices"),
-	}
+	return db
+}
 
-	req := db.Client.QueryRequest(input)
-
+// ListTables list DynamoDB tables
+func (db DB) ListTables() {
+	input := &dynamodb.ListTablesInput{}
+	req := db.Client.ListTablesRequest(input)
 	res, err := req.Send()
+
 	if err != nil {
 		fmt.Println(err)
 	} else {
 		fmt.Println(res)
 	}
-
-	return db
 }
 
-func (db DB) listTables() {
-	input := &dynamodb.ListTablesInput{}
-	req := db.Client.ListTablesRequest(input)
-	res, err := req.Send()
+// Query table, primary_key
+func (db DB) Query(table string, primaryKey string) {
+	input := &dynamodb.QueryInput{
+		ExpressionAttributeValues: map[string]dynamodb.AttributeValue{
+			":id": {
+				S: aws.String(primaryKey),
+			},
+		},
+		KeyConditionExpression: aws.String("id = :id"),
+		TableName:              aws.String(table),
+	}
 
+	req := db.Client.QueryRequest(input)
+
+	res, err := req.Send()
 	if err != nil {
 		fmt.Println(err)
 	} else {
