@@ -25,6 +25,10 @@ type DB struct {
 	Error  error
 }
 
+func init() {
+	createDirIfNotExist("cache")
+}
+
 // New carete new DynamoDB access instance
 func New(region string) DB {
 	db := DB{
@@ -42,14 +46,19 @@ func New(region string) DB {
 
 	db.Client = dynamodb.New(db.Config)
 
+	return db
+}
+
+// Query table, primary_key
+func (db DB) Query(table string, primaryKey string) {
 	input := &dynamodb.QueryInput{
 		ExpressionAttributeValues: map[string]dynamodb.AttributeValue{
 			":id": {
-				S: aws.String("03AFB154"),
+				S: aws.String(primaryKey),
 			},
 		},
 		KeyConditionExpression: aws.String("id = :id"),
-		TableName:              aws.String("g3_devices"),
+		TableName:              aws.String(table),
 	}
 
 	req := db.Client.QueryRequest(input)
@@ -62,18 +71,4 @@ func New(region string) DB {
 	}
 
 	return db
-}
-
-func (db DB) listTables() int {
-	input := &dynamodb.ListTablesInput{}
-	req := db.Client.ListTablesRequest(input)
-	res, err := req.Send()
-
-	if err != nil {
-		fmt.Println(err)
-	} else {
-		fmt.Println(res)
-	}
-
-	return 0
 }
