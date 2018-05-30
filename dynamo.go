@@ -64,7 +64,7 @@ func New(region string) DB {
 	return db
 }
 
-func (db DB) listTables() {
+func (db DB) listTables() int {
 	input := &dynamodb.ListTablesInput{}
 	req := db.Client.ListTablesRequest(input)
 	res, err := req.Send()
@@ -74,4 +74,6 @@ func (db DB) listTables() {
 	} else {
 		fmt.Println(res)
 	}
+
+	return 0
 }
